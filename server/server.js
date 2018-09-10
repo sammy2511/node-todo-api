@@ -26,6 +26,16 @@ app.post('/todos',(req,res) => {
 });
 
 
+//route to GET todos
+app.get('/todos',(req,res) => {
+  Todo.find().then((todos) => {
+    res.send({todos});
+  },(err) => {
+    res.status(400).send(err);
+  });
+});
+
+
 
 //starting server
 app.listen(3000,() => {
