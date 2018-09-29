@@ -109,6 +109,22 @@ app.patch('/todos/:id',(req,res) => {
 
 });
 
+//Route to Insert user
+app.post('/users',(req,res) =>{
+  var body = lodash.pick(req.body,['email','password']);
+  var user = new User(body);
+
+  user.save().then((doc) =>{
+    return user.generateAuthToken();
+  }).then( (token) => {
+    res.header('x-auth',token).send(user.toJSON());
+  }).catch((e) => {
+    res.status(400).send();
+  });
+
+
+});
+
 
 //starting server
 app.listen(port,() => {
