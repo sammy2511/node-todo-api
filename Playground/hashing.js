@@ -1,17 +1,41 @@
 const { SHA256 } = require('crypto-js');
 const webToken = require('jsonwebtoken');
 
-var data = {
-  id: 10
-};
+var bcrypt = require('bcryptjs');
 
-// .sign(data,SecretKey); it will return token
-var token = webToken.sign(data,'someText');
-console.log('Token',token);
+var password = "abc1";
+// 
+//
+// bcrypt.genSalt(10,(err,salt) => {
+//   bcrypt.hash(password,salt,(err,hash) => {
+//     passHash = hash;
+//     console.log('hash',hash);
+//
+//   });
+// });
 
-// .verify(token) verifies that data is not manipulated by taking tokens as input
-var decodedData = webToken.verify(token,'someText');
-console.log('Data',decodedData);
+var passHash = '$2a$10$X/U/Gcg9R7pR7eUyPA6lj.HJy.yCdbdeB54UQc8oVY5HpBDsbAPYW'
+
+bcrypt.compare(password, passHash).then((res) => {
+  if(res){
+    console.log('Correct Password');
+  }
+}).catch((e)=>{
+  console.log(e);
+});
+
+
+// var data = {
+//   id: 10
+// };
+//
+// // .sign(data,SecretKey); it will return token
+// var token = webToken.sign(data,'someText');
+// console.log('Token',token);
+//
+// // .verify(token) verifies that data is not manipulated by taking tokens as input
+// var decodedData = webToken.verify(token,'someText');
+// console.log('Data',decodedData);
 
 
 // var message = 'I am Normal Message';
