@@ -4,25 +4,25 @@ const webToken = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 
 var password = "abc1";
-// 
-//
-// bcrypt.genSalt(10,(err,salt) => {
-//   bcrypt.hash(password,salt,(err,hash) => {
-//     passHash = hash;
-//     console.log('hash',hash);
-//
-//   });
-// });
 
-var passHash = '$2a$10$X/U/Gcg9R7pR7eUyPA6lj.HJy.yCdbdeB54UQc8oVY5HpBDsbAPYW'
 
-bcrypt.compare(password, passHash).then((res) => {
-  if(res){
-    console.log('Correct Password');
-  }
-}).catch((e)=>{
-  console.log(e);
+bcrypt.genSalt(10,(err,salt) => {
+  bcrypt.hash(password,salt,(err,hash) => {
+    passHash = hash;
+    console.log('hash',hash);
+
+  });
 });
+
+// var passHash = '$2a$10$X/U/Gcg9R7pR7eUyPA6lj.HJy.yCdbdeB54UQc8oVY5HpBDsbAPYW'
+//
+// bcrypt.compare(password, passHash).then((res) => {
+//   if(res){
+//     console.log('Correct Password');
+//   }
+// }).catch((e)=>{
+//   console.log(e);
+// });
 
 
 // var data = {
