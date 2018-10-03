@@ -132,6 +132,22 @@ app.get('/users/me',authenticate,(req,res) => {
   res.send(req.user);
 });
 
+//Route to Login UserSchema
+app.post('/users/login',(req,res) => {
+  var body = lodash.pick(req.body,['email','password']);
+
+  User.Login (body.email,body.password).then((user) => {
+    //verify password
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth',token).send(user);
+    })
+  }).catch((e) => {
+    //no user found
+    res.status(401).send();
+  });
+
+})
+
 
 //starting server
 app.listen(port,() => {
