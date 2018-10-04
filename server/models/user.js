@@ -43,7 +43,7 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function(){
   var user = this;
   var access = 'auth';
-  var token =  webToken.sign({_id:user._id.toHexString(),access:access},'myKey').toString();
+  var token =  webToken.sign({_id:user._id.toHexString(),access:access},process.env.WEBTOKEN_KEY).toString();
 
   user.tokens.push({
     access:access,
@@ -70,7 +70,7 @@ UserSchema.statics.findByToken = function(token){
   var decoded;
 
   try {
-    decoded = webToken.verify(token,'myKey');
+    decoded = webToken.verify(token,process.env.WEBTOKEN_KEY);
   } catch (e) {
     return Promise.reject('Authentication Required');
   }

@@ -1,3 +1,5 @@
+require('./config/config');
+
 var express = require('express');
 var bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
@@ -14,10 +16,10 @@ app.use(bodyParser.json());
 
 
 //route to POST
-app.post('/todos',(req,res) => {
-  console.log(req.body);
+app.post('/todos',authenticate,(req,res) => {
   var todo = new Todo({
-    text:req.body.text
+    text:req.body.text,
+    createdBy: req.user._id
   });
 
   todo.save().then((doc) => {
@@ -29,8 +31,10 @@ app.post('/todos',(req,res) => {
 
 
 //route to GET todos
-app.get('/todos',(req,res) => {
-  Todo.find().then((todos) => {
+app.get('/todos',authenticate,(req,res) => {
+  Todo.find({
+    createdBy : req.user._id
+  }).then((todos) => {
     res.send({todos});
   },(err) => {
     res.status(400).send(err);
@@ -38,7 +42,7 @@ app.get('/todos',(req,res) => {
 });
 
 //route to GET todos by ID
-app.get('/todos/:id',(req,res) => {
+app.get('/todos/:id',authenticate,(req,res) => {
   var id = req.params.id;
 
   //if not Valid ID
@@ -47,7 +51,10 @@ app.get('/todos/:id',(req,res) => {
   }
 
   //find by ID
-  Todo.findById(id).then((todo) => {
+  Todo.findOne({
+    _id:id,
+    createdBy:req.user._id
+  }).then((todo) => {
     if (todo) {
       res.send(todo);
     }
@@ -61,7 +68,7 @@ app.get('/todos/:id',(req,res) => {
 
 
 //route to DELETE todo by ID
-app.delete('/todos/:id',(req,res) => {
+app.delete('/todos/:id',authenticate,(req,res) => {
   var id = req.params.id;
 
   //if not Valid ID
@@ -70,7 +77,10 @@ app.delete('/todos/:id',(req,res) => {
   }
 
   //find by ID and DELETE
-  Todo.findByIdAndRemove(id).then((todo) => {
+  Todo.findOneAndRemove({
+    _id:id,
+    createdBy:req.user._id
+  }).then((todo) => {
     if(todo){
       res.send(todo);
     }
@@ -83,7 +93,7 @@ app.delete('/todos/:id',(req,res) => {
 });
 
 //Update todo
-app.patch('/todos/:id',(req,res) => {
+app.patch('/todos/:id',authenticate,(req,res) => {
   var id = req.params.id;
   var body = lodash.pick(req.body,['text','completed']);
 
@@ -99,7 +109,12 @@ app.patch('/todos/:id',(req,res) => {
     body.completedAt = null;
   }
 
-  Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo) => {
+  Todo.findOneAndUpdate(
+    {_id:id,
+    createdBy:req.user._id},
+    {$set:body},
+    {new:true}
+  ).then((todo) => {
     if(!todo){
       return res.status(404).send();
     }
